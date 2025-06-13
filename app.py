@@ -156,6 +156,8 @@ api_df['Forecast'] = api_df['Forecast'] / 1000
 
 forecast_weekly_df = api_df[(api_df['DateKey'] >= selected_date) & (api_df['DateKey'] <= max_date)]
 
+
+#5v. Plotting the weekly development graph
 merged_df = actuals_weekly_df[['DateKey', 'SalesAmount']].merge(
     forecast_weekly_df, on='DateKey', how='outer'
 )

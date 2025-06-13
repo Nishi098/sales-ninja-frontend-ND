@@ -20,8 +20,8 @@ install_requirements:
 #         HEROKU COMMANDS
 # ----------------------------------
 
-streamlit:
-	-@streamlit run app.py
+streamlit1:
+	-@streamlit run appcopy.py
 
 
 # ----------------------------------
