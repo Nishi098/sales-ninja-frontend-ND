@@ -38,3 +38,9 @@ prediction = response.json()
 pred = prediction['fare']
 
 st.header(f'Fare amount: ${round(pred, 2)}')
+
+
+forecast_api_url = 'https://salesninjaapi-752034082007.europe-west1.run.app/predict_basic'
+response = requests.get(forecast_api_url, params=params)
+
+prediction = response.json()
