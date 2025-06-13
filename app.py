@@ -5,32 +5,12 @@ import requests
 import datetime
 import matplotlib.pyplot as plt
 import datetime
-from google.oauth2 import service_account
-import pandas_gbq
+
 
 #I need a dataset with dates for each day
 #I need kumar's table to have data for each date
 #I need my 0.1% sample to have data from each date
 #I probably need my data to be multiplied by 1000
-
-#0f Load credentials from Streamlit secrets
-credentials_dict = {
-    "type": st.secrets["connections.gcs"]["type"],
-    "project_id": st.secrets["connections.gcs"]["project_id"],
-    "private_key_id": st.secrets["connections.gcs"]["private_key_id"],
-    "private_key": st.secrets["connections.gcs"]["private_key"],
-    "client_email": st.secrets["connections.gcs"]["client_email"],
-    "client_id": st.secrets["connections.gcs"]["client_id"],
-    "auth_uri": st.secrets["connections.gcs"]["auth_uri"],
-    "token_uri": st.secrets["connections.gcs"]["token_uri"],
-    "auth_provider_x509_cert_url": st.secrets["connections.gcs"]["auth_provider_x509_cert_url"],
-    "client_x509_cert_url": st.secrets["connections.gcs"]["client_x509_cert_url"],
-    "universe_domain": st.secrets["connections.gcs"].get("universe_domain", "googleapis.com")
-}
-
-credentials = service_account.Credentials.from_service_account_info(credentials_dict)
-
-
 
 #1f. Load dull data for actuals
 min_date_load = parse("2007-01-01").strftime('%Y-%m-%d')  # e.g. '2007-01-01'
@@ -43,7 +23,7 @@ query = f"""
 """
 
 
-df_full = pandas_gbq.read_gbq(query,project_id='nodal-clock-456815-g3', credentials=credentials)  # Assuming you have a BigQuery client set up
+df_full = pd.read_gbq(query,project_id='nodal-clock-456815-g3')  # Assuming you have a BigQuery client set up
 df = df_full.sample(frac=0.1, random_state=42)  # 10% random sample
 
 
