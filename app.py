@@ -5,12 +5,34 @@ import requests
 import datetime
 import matplotlib.pyplot as plt
 import datetime
-
+import calendar
+import pandas_gbq
+from google.oauth2 import service_account
 
 #I need a dataset with dates for each day
 #I need kumar's table to have data for each date
 #I need my 0.1% sample to have data from each date
 #I probably need my data to be multiplied by 1000
+
+
+# Load credentials from Streamlit secrets
+credentials_dict = {
+  "type": "service_account",
+  "project_id": "nodal-clock-456815-g3",
+  "private_key_id": "d7b300b4e7bcf35c62ac237216cc603bec9bea4f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCooaD7zWERbRfA\nVYLapS5etD32XoQRcZGhoFs9zVGBfCHVJ9K1thQnzvCfAmQp7j+e9u+DNlFOINKX\nCzCjTRtZUIfxQ4cS2wZRw4ayFJPbmwVqSgCJSAJDEyXju4PQuyBDrCZbEaGNABdH\nLbKhEv31ypun1tT7rImYP8lDspARzoMlIoAc9gIcljTqtxroqPgEKQLl9vxfLOhM\nOBlypWwNLDQWejexB2CdcMFZ4hCvqx9A0bMmsd1CzpCybcTeTsjSx3jlzsb9QYsz\nfSzjNMQcu0CvkUPMIPazIf1q9siblDLAM6fHecrsAnLxVq4YoQErTtBmzwqf1evf\nHbJG6vDnAgMBAAECggEAOyQIahczAmIQ0OcMj/MbiqJLEuM+DUIX0agEJ+4gtjlb\nQj8HsqvrcLSuhg3YJC6HCJDRGmML68suIEQP6E3MGCxaqP5GWpIPKtDYpg76divt\nn8PZYUwsYurNwItMpQFjxOgUwZ6y2lkcUN3RhpU7FR9cLOZ25tcxoIBKbWAsD9ob\nB4gaSsSKTEBOegKkmJociBvyx1Rj/Gu6wlfTWIqbjVJqFet/g3gNz+OfNe2gZsQr\n01NYNWvwtTaEcd2J6mEX2qHNSGPp2i1MJ0Osmip8LbFULMXUqPShyjE3iX/nt/5L\nx/LOd7TvOcykSlMnMErg3Ja/IH9QYt6KQHFEjg0YoQKBgQDsYoAFkoiKcPVnsEca\nd1RHHeHBhUByfIW0omZF/HHC+XtuGysrK3a8/c4DOA255BcFJpjbbJxHHSLBSSGj\n6h0tcOnPsAJqrLV2mEecOlmm7AtUze8xNerj4mDWEgw1N7UypWykH34xzlwD5EMR\nwl02duQXQgftBsTQktvdWfwY4QKBgQC2n9lzsqpQNJiGDaUbMulXkLHTDxeiuwtR\nmfEJui1a96JpejPRQGXLP1fn4GgxCIIAdRVeMqafkt7dYS2Rk3o0//TAOX0C3tJS\n5QABE5yy4GY2RUMMzZBEDA7zHRE1+MYo5QN6P0xjTkp+oiiYLAdsJko8rKlM9y18\nGREka0TaxwKBgQCcLLvOcrC5XsYUOnfPuZU54zk7ZTFeMn0YCc+uX4o9uhzdcx/D\nRtUNKlaI8+jFrzeyVHzbQ9fAeDR1JT8Pj+a1Fgu0BuKh3feKIjP1uOtwiDU4U1K7\n3ZaR9wfph0T/iA20J20uxgvXFjLe81mIizSQfl5WK28XH8i60Lxoc0JGoQKBgHoy\ng4JTLnr0dopcXvnQGyqoexRKqPoORgiYBR0JIogX4ujJCBsgB/zzqZJSKeWFV9eO\ngHnDUpK757wh5ifekoscKVzmGqvtBLbK3DHcOaHHXR07Qx4x/jJKD0bFUFrY119N\nvgHykN5x6I7LWnZYH69R/6KRtcb2Lc03yKyhyjTJAoGAYTyYfCniqxCuriDyV5D1\n2WSwm7Gyfh2NEy3NPBjihuKgDDdC5+zHZ9Z5lMkQ2lU7VZcRsX10RwxSk81T+0Yk\nz+d7koujLWS9fV90Eq2MaDZJ83DwgGj8sINW73WjQi1nPjbU3I39LvjPybZ8zKrn\nfb6wFCiPOzpqnplrbm1rlBY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "le-wagon-data-bootcamp@nodal-clock-456815-g3.iam.gserviceaccount.com",
+  "client_id": "108534482050987661068",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/le-wagon-data-bootcamp%40nodal-clock-456815-g3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+
+
+
 
 #1f. Load dull data for actuals
 min_date_load = parse("2007-01-01").strftime('%Y-%m-%d')  # e.g. '2007-01-01'
@@ -23,9 +45,13 @@ query = f"""
 """
 
 
-df_full = pd.read_gbq(query,project_id='nodal-clock-456815-g3')  # Assuming you have a BigQuery client set up
+# Query BigQuery using pandas_gbq
+df_full = pandas_gbq.read_gbq(
+    query,
+    project_id='nodal-clock-456815-g3',
+    credentials=credentials
+)
 df = df_full.sample(frac=0.1, random_state=42)  # 10% random sample
-
 
 
 
