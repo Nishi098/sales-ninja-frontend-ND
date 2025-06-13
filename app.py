@@ -1,10 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 from dateutil.parser import parse
-from dateutil.parser import parse
-import locale
-from io import StringIO
 import requests
 import datetime
 import matplotlib.pyplot as plt
